@@ -20,11 +20,14 @@ const isbn = async (isbnBrut) => {
 
   const { converted_isbn: isbnConverted, isbn: isbnOriginal } = data.results;
   if (isbnConverted.includes("Bad ISBN"))
-    return `Error: Bad ISBN (${isbnBrut})`;
+    return { result: false, error: `Error: Bad ISBN (${isbnBrut})` };
 
-  const result = {
-    isbn10: isbnClean.length === 10 ? isbnOriginal : isbnConverted,
-    isbn13: isbnClean.length === 13 ? isbnOriginal : isbnConverted,
+  return {
+    result: true,
+    data: {
+      isbn10: isbnClean.length === 10 ? isbnOriginal : isbnConverted,
+      isbn13: isbnClean.length === 13 ? isbnOriginal : isbnConverted,
+    },
   };
   return result;
 };

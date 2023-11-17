@@ -1,4 +1,5 @@
 const puppeteer = require("puppeteer");
+const isbn = require("./modules/isbn");
 
 const idSelect = "#valuable-books";
 
@@ -20,7 +21,7 @@ const scrapperBooks = async (url) => {
     const totalBooks = await element.$$eval("tbody > tr", (list) => {
       const o = new Object();
       // Map each tr
-      list.map((el) => {
+      list.map(async (el) => {
         // Find the counter
         const counter = el.querySelector("td.counter").textContent.trim();
         if (!counter) return;
@@ -47,9 +48,19 @@ const scrapperBooks = async (url) => {
           format,
           price,
         ] = found;
+
+        const isbnBrut = url.match(/prix\/([^\/]+)/);
+
+        let id = null;
+        if (isbnBrut) {
+          const isbnFetch = await isbn(isbnBrut[1]);
+          if (isbnFetch.result) id = isbnFetch.data.isbn10;
+        }
+
         o[counter] = {
           result: true,
           url,
+          id,
           title,
           author,
           urlEditor,
